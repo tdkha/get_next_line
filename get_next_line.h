@@ -6,7 +6,7 @@
 /*   By: ktieu <kha.tieu@student.hive.fi>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 15:43:50 by ktieu             #+#    #+#             */
-/*   Updated: 2024/05/06 08:12:45 by ktieu            ###   ########.fr       */
+/*   Updated: 2024/05/07 09:03:16 by ktieu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ size_t	find_next_line_break(char *str, size_t i);
 size_t	ft_strlen(const char *str);
 char	*ft_strdup(const char *s);
 char	*ft_strchr(const char *s, int c);
-char	*ft_strjoin(char const *s1, char const *s2);
+char	*ft_strjoin(char *s1, char *s2);
 char	*get_next_line(int fd);
+char    *ft_substr(char const *s, unsigned int start, size_t len);
 
 #endif

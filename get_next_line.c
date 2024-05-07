@@ -6,7 +6,7 @@
 /*   By: ktieu <kha.tieu@student.hive.fi>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/05 15:43:39 by ktieu             #+#    #+#             */
-/*   Updated: 2024/05/06 09:00:00 by ktieu            ###   ########.fr       */
+/*   Updated: 2024/05/07 09:08:00 by ktieu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,47 +33,20 @@ static char	*get_line_from_main_buffer(char *main_buffer)
 	int		i;
 
 	i = 0;
-	i = find_next_line_break(main_buffer, i);
-	newline = (char *) malloc (sizeof(char) * (i + 1));
-	if (!newline)
-		return (NULL);
-	i = 0;
 	while (main_buffer[i] && main_buffer[i] != '\n')
-	{
-		newline[i] = main_buffer[i];
-		i++;
-	}
-	if (main_buffer[i] == '\n')
-	{
-		newline[i] = main_buffer[i];
-		i++;
-	}
-	newline[i] = '\0';
+    {
+        i++;
+    }
+
+    newline = ft_substr(main_buffer, 0, i);
 	return (newline);
 }
 
-static char	*reform_main_buffer(char *main_buffer)
+static char	*reform_main_buffer(char *main_buffer, int i)
 {
-	int		i;
-	int		j;
 	char	*new_main_buffer;
 
-	i = 0;
-	j = 0;
-	if (!*main_buffer)
-		return (free(main_buffer), NULL);
-	i = find_next_line_break(main_buffer, i);
-	new_main_buffer = (char *) malloc (((ft_strlen(main_buffer) - i) + 1));
-	if (!new_main_buffer)
-	{
-		free(main_buffer);
-		return (NULL);
-	}
-	while (main_buffer[i])
-		new_main_buffer[j++] = main_buffer[i++];
-	new_main_buffer[j] = '\0';
-	if (!*main_buffer)
-		return (free(main_buffer), free(new_main_buffer), NULL);
+	new_main_buffer = ft_substr(main_buffer, i + 1, ft_strlen(main_buffer) - i - 1);
 	free(main_buffer);
 	return (new_main_buffer);
 }
@@ -100,15 +73,14 @@ char	*get_next_line(int fd)
 		if (bytes < 0)
 			return (free_all_buffers(main_buffer, temp_buffer));
 		temp_buffer[bytes] = '\0';
-		if (main_buffer == NULL)
-			main_buffer = ft_strdup(temp_buffer);
-		else
-			main_buffer = ft_strjoin(main_buffer, temp_buffer);
+		main_buffer = ft_strjoin(main_buffer, temp_buffer);
 		if (!main_buffer)
 			return (free_all_buffers(main_buffer, temp_buffer));
-		free(temp_buffer);
 	}
+	free(temp_buffer);
+	if (!main_buffer)
+        return (NULL);
 	temp_buffer = get_line_from_main_buffer(main_buffer);
-	main_buffer = reform_main_buffer(main_buffer);
+	main_buffer = reform_main_buffer(main_buffer, ft_strlen(temp_buffer));
 	return (temp_buffer);
 }
