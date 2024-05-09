@@ -1,23 +1,19 @@
-#include <stdio.h>
-#include <fcntl.h>
+
 #include "get_next_line.h"
+#include <fcntl.h>
 
 int main(void)
 {
-  int    fd;
-  char  *next_line;
-  int  count;
-
-  count = 0;
-  fd = open("test.txt", O_RDONLY);
-  next_line = get_next_line(fd);
-  count++;
-  printf("[%d]:%s", count, next_line);
-  next_line = get_next_line(fd);
-  count++;
-  printf("[%d]:%s", count, next_line);
-  next_line = NULL;
-	free(next_line);
-  close(fd);
-  return (0);
+	int fd = open("read_error.txt", O_RDONLY);
+	char *main_buffer = get_next_line(fd);
+	printf("Line: %s",main_buffer);
+	main_buffer = get_next_line(fd);
+	printf("Line: %s",main_buffer);
+	main_buffer = get_next_line(fd);
+	printf("Line: %s",main_buffer);
+	main_buffer = get_next_line(fd);
+	printf("Line: %s",main_buffer);
+	main_buffer = get_next_line(fd);
+	printf("Line: %s",main_buffer);
+	close(fd);
 }

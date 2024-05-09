@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktieu <kha.tieu@student.hive.fi>           +#+  +:+       +#+        */
+/*   By: ktieu <ktieu@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/05 15:43:50 by ktieu             #+#    #+#             */
-/*   Updated: 2024/05/07 09:03:16 by ktieu            ###   ########.fr       */
+/*   Created: 2024/05/09 12:27:38 by ktieu             #+#    #+#             */
+/*   Updated: 2024/05/09 14:35:46 by ktieu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,18 @@
 # include <stdio.h>
 # include <limits.h>
 
-size_t	find_next_line_break(char *str, size_t i);
-size_t	ft_strlen(const char *str);
-char	*ft_strdup(const char *s);
-char	*ft_strchr(const char *s, int c);
-char	*ft_strjoin(char *s1, char *s2);
+/*--------------------------------------------------------------------------------*/
+/*							HELPER FUNCTIONS*/
+/*--------------------------------------------------------------------------------*/
+
+size_t	ft_strlen(const char *s);
+void	ft_bzero(void *s, size_t n);
+void	*ft_memcpy(void *dst, const void *src, size_t n);
+char	*ft_strjoin_gnl(char *s1, char *s2, int *end_line_index);
+void	ft_strlcpy_gnl(char *dst, const char *src, size_t dst_size);
+/*--------------------------------------------------------------------------------*/
+/*							MAIN FUNCTIONS											*/
+/*--------------------------------------------------------------------------------*/
 char	*get_next_line(int fd);
-char    *ft_substr(char const *s, unsigned int start, size_t len);
 
 #endif

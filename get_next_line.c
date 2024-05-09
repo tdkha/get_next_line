@@ -3,84 +3,97 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ktieu <kha.tieu@student.hive.fi>           +#+  +:+       +#+        */
+/*   By: ktieu <ktieu@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/05 15:43:39 by ktieu             #+#    #+#             */
-/*   Updated: 2024/05/07 09:08:00 by ktieu            ###   ########.fr       */
+/*   Created: 2024/05/09 12:35:57 by ktieu             #+#    #+#             */
+/*   Updated: 2024/05/09 14:39:51 by ktieu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-/* ---------------------------------------------------------------- */
-/*						BUFFER INTERACTIONS							*/
-/* ---------------------------------------------------------------- */
-
-static void	*free_all_buffers(char *main_buffer, char *temp_buffer)
+char	*init_line(char *stash, int *eol_loc)
 {
-	if (main_buffer)
-		free(main_buffer);
-	if (temp_buffer)
-		free(temp_buffer);
-	main_buffer = NULL;
-	temp_buffer = NULL;
-	return (NULL);
+	size_t	len;
+	char	*line;
+
+	len = 0;
+	while (stash[len] && stash[len] != '\n')
+		len++;
+	len++;
+	line = malloc(sizeof(char) * (len + 1));
+	if (!line)
+		return (NULL);
+	ft_memcpy(line, stash, len);
+	line[len] = '\0';
+	if (len > 0 && line[len - 1] == '\n')
+		*eol_loc = len - 1;
+	return (line);
 }
 
-static char	*get_line_from_main_buffer(char *main_buffer)
+size_t	locate_eol(char *line)
 {
-	char	*newline;
-	int		i;
+	size_t	i;
 
 	i = 0;
-	while (main_buffer[i] && main_buffer[i] != '\n')
-    {
-        i++;
-    }
-
-    newline = ft_substr(main_buffer, 0, i);
-	return (newline);
+	if (!line)
+		return (-1);
+	while (i < BUFFER_SIZE)
+	{
+		if (line[i] == '\n' || line[i] == '\0')
+			return (i + 1);
+		i++;
+	}
+	return (i);
 }
 
-static char	*reform_main_buffer(char *main_buffer, int i)
+char	*extract_line(char *line, char *stash, int *eol_loc, int fd)
 {
-	char	*new_main_buffer;
+	char	buffer[BUFFER_SIZE + 1];
+	ssize_t	read_check;
+	size_t	line_size;
 
-	new_main_buffer = ft_substr(main_buffer, i + 1, ft_strlen(main_buffer) - i - 1);
-	free(main_buffer);
-	return (new_main_buffer);
+	while (*eol_loc == -1)
+	{
+		ft_bzero(buffer, (BUFFER_SIZE + 1));
+		read_check = read(fd, buffer, BUFFER_SIZE);
+		if (read_check == -1)
+		{
+			free(line);
+			ft_bzero(stash, (BUFFER_SIZE + 1));
+			return (NULL);
+		}
+		line_size = locate_eol(buffer);
+		ft_strlcpy_gnl(stash, &buffer[line_size], (BUFFER_SIZE + 1));
+		buffer[line_size] = '\0';
+		line = ft_strjoin_gnl(line, buffer, eol_loc);
+		if (read_check == 0)
+		{
+			ft_bzero(stash, BUFFER_SIZE + 1);
+			break ;
+		}
+	}
+	return (line);
 }
-
-/* ---------------------------------------------------------------- */
-/*							MAIN FUNCTIONS							*/
-/* ---------------------------------------------------------------- */
 
 char	*get_next_line(int fd)
 {
-	static char	*main_buffer;
-	char		*temp_buffer;
-	int			bytes;
+	static char	stash[BUFFER_SIZE + 1];
+	char		*line;
+	int			eol_loc;
 
-	bytes = 1;
-	if (fd < 0 || BUFFER_SIZE <= 0  || BUFFER_SIZE > INT_MAX)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	temp_buffer = (char *) malloc (sizeof(char) * (BUFFER_SIZE + 1));
-	if (!temp_buffer)
+	eol_loc = -1;
+	line = init_line(stash, &eol_loc);
+	if (!line)
 		return (NULL);
-	while (!ft_strchr(main_buffer, '\n') && bytes > 0)
+	ft_strlcpy_gnl(stash, &stash[eol_loc + 1], BUFFER_SIZE + 1);
+	line = extract_line(line, stash, &eol_loc, fd);
+	if (!line || line[0] == '\0')
 	{
-		bytes = read(fd, temp_buffer, BUFFER_SIZE);
-		if (bytes < 0)
-			return (free_all_buffers(main_buffer, temp_buffer));
-		temp_buffer[bytes] = '\0';
-		main_buffer = ft_strjoin(main_buffer, temp_buffer);
-		if (!main_buffer)
-			return (free_all_buffers(main_buffer, temp_buffer));
+		free(line);
+		return (NULL);
 	}
-	free(temp_buffer);
-	if (!main_buffer)
-        return (NULL);
-	temp_buffer = get_line_from_main_buffer(main_buffer);
-	main_buffer = reform_main_buffer(main_buffer, ft_strlen(temp_buffer));
-	return (temp_buffer);
+	return (line);
 }
