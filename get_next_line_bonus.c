@@ -6,7 +6,7 @@
 /*   By: ktieu <ktieu@student.hive.fi>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/10 13:24:37 by ktieu             #+#    #+#             */
-/*   Updated: 2024/05/10 13:24:40 by ktieu            ###   ########.fr       */
+/*   Updated: 2024/05/10 13:32:42 by ktieu            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ char	*get_next_line(int fd)
 	char		*line;
 	int			eol_index;
 
-	if (fd < 0 || fd > FOPEN_MAX || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd >= FOPEN_MAX || BUFFER_SIZE <= 0)
 		return (NULL);
 	eol_index = -1;
 	line = init_line(static_buff[fd], &eol_index);
