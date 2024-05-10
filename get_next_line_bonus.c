@@ -1,6 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ktieu <ktieu@student.42.fr>                +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/05/10 13:12:21 by ktieu             #+#    #+#             */
+/*   Updated: 2024/05/10 13:21:13 by ktieu            ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ktieu <ktieu@student.hive.fi>              +#+  +:+       +#+        */
@@ -10,7 +22,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 static char	*init_line(char *static_buff, int *eol_index)
 {
@@ -82,18 +94,20 @@ static char	*extract_line(
 
 char	*get_next_line(int fd)
 {
-	static char	static_buff[BUFFER_SIZE + 1];
+	static char	static_buff[FOPEN_MAX][BUFFER_SIZE + 1];
 	char		*line;
 	int			eol_index;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || fd > FOPEN_MAX || BUFFER_SIZE <= 0)
 		return (NULL);
 	eol_index = -1;
-	line = init_line(static_buff, &eol_index);
+	line = init_line(static_buff[fd], &eol_index);
 	if (!line)
 		return (NULL);
-	ft_strlcpy_gnl(static_buff, &static_buff[eol_index + 1], BUFFER_SIZE + 1);
-	line = extract_line(line, static_buff, &eol_index, fd);
+	ft_strlcpy_gnl(static_buff[fd],
+		&static_buff[fd][eol_index + 1],
+		BUFFER_SIZE + 1);
+	line = extract_line(line, static_buff[fd], &eol_index, fd);
 	if (!line || line[0] == '\0')
 	{
 		free(line);
